@@ -2,6 +2,7 @@ import fastify from "fastify";
 import view from "@fastify/view";
 import pug from "pug";
 import { Builder } from "./Builder.js";
+import { ListToPdfExporter } from "./exporters/ListToPdfExporter.js";
 
 const isUrl = (s: string) => {
   try {
@@ -16,7 +17,7 @@ const isUrl = (s: string) => {
 const server = fastify();
 const PORT = 8080;
 
-const initServer = async (builder: Builder) => {
+const initServer = async (builder: Builder, exporter: ListToPdfExporter) => {
   await server.register(view, { engine: { pug } });
 
   server.get("/", (req, res) => {
@@ -26,8 +27,8 @@ const initServer = async (builder: Builder) => {
       if (!isUrl(url)) {
         res.view("/src/views/index", { url, warning: true });
       }
-      builder.build(url).then((pdf) => {
-        res.type("application/pdf").send(pdf);
+      builder.build(url).then((data: string) => {
+        exporter.export(data, res);
       });
     } else {
       res.view("/src/views/index");

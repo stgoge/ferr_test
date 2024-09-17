@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { AbstractProcessor } from "./AbstractProcessor.js";
 
-export class WordsByLengthProcessor extends AbstractProcessor {
+export class TextToWordsByLengthProcessor extends AbstractProcessor {
   count: number = 10;
   longest: boolean = false;
   separator: string = " ";

@@ -1,23 +1,22 @@
 import { Builder } from "./Builder.js";
 import { HTMLtoTextProcessor } from "./processors/HTMLtoTextProcessor.js";
-import { TextToPdfListProcessor } from "./processors/TextToPdfListProcessor.js";
-import { LoadFromSingleUrlProcessor } from "./processors/LoadFromSingleUrlProcessor.js";
-import { WordsByLengthProcessor } from "./processors/WordsByLengthProcessor.js";
-import { initServer } from "./server.js";
-
-const builder = new Builder();
+import { WordsToPdfListExporter } from "./exporters/WordsToPdfListExporter.js";
+import { FromSingleUrlLoader } from "./loaders/FromSingleUrlLoader.js";
+import { TextToWordsByLengthProcessor } from "./processors/TextToWordsByLengthProcessor.js";
+import { startServer } from "./server.js";
 
 const WORDS_COUNT = 10;
 const LONGEST = true;
 
-builder
-  .addProcessor(new LoadFromSingleUrlProcessor())
-  .addProcessor(new HTMLtoTextProcessor())
-  .addProcessor(new WordsByLengthProcessor(WORDS_COUNT, LONGEST))
-  .addProcessor(
-    new TextToPdfListProcessor(
-      `Top ${WORDS_COUNT} ${LONGEST ? "longest" : "shortest"} words on page`
-    )
-  );
+const builder = new Builder({
+  loader: new FromSingleUrlLoader(),
+  processors: [
+    new HTMLtoTextProcessor(),
+    new TextToWordsByLengthProcessor(WORDS_COUNT, LONGEST),
+  ],
+  exporter: new WordsToPdfListExporter(
+    `Top ${WORDS_COUNT} ${LONGEST ? "longest" : "shortest"} words on page`
+  ),
+});
 
-initServer(builder);
+startServer(builder);

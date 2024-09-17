@@ -1,26 +1,39 @@
+import { FastifyReply } from "fastify";
+import { AbstractExporter } from "./exporters/AbstractExporter.js";
+import { AbstractLoader } from "./loaders/AbstractLoader.js";
 import { AbstractProcessor } from "./processors/AbstractProcessor.js";
 
 export class Builder {
-  processors: AbstractProcessor[] = [];
-  constructor(processors?: AbstractProcessor[]) {
-    this.processors = processors ? processors.slice() : [];
+  loader: AbstractLoader;
+  processors: AbstractProcessor[];
+  exporter: AbstractExporter;
+  constructor(options: {
+    loader: AbstractLoader;
+    processors?: AbstractProcessor[];
+    exporter: AbstractExporter;
+  }) {
+    this.loader = options.loader;
+    this.processors = options.processors ? options.processors.slice() : [];
+    this.exporter = options.exporter;
   }
-  addProcessor(processor: AbstractProcessor): this {
-    this.processors.push(processor);
-    return this;
-  }
-  build(str: string): Promise<string> {
-    const processors = this.processors.slice().reverse();
+
+  build(source: string, response: FastifyReply) {
     return new Promise((resolve) => {
-      const buildInternal = (data: string) => {
-        const processor = processors.pop();
-        if (processor) {
-          processor.process(data).then(buildInternal);
-        } else {
-          resolve(data);
-        }
-      };
-      buildInternal(str);
+      this.loader.load(source).then((data: string) => {
+        const processors = this.processors.slice().reverse();
+
+        const internalProcess = (text: string) => {
+          const processor = processors.pop();
+
+          if (processor) {
+            processor.process(text).then(internalProcess);
+          } else {
+            this.exporter.export(text, response).then(resolve);
+          }
+        };
+
+        internalProcess(data);
+      });
     });
   }
 }

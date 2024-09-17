@@ -14,20 +14,22 @@ const isUrl = (s: string) => {
 };
 
 const server = fastify();
+await server.register(view, { engine: { pug } });
+
 const PORT = 8080;
 
-const initServer = async (builder: Builder) => {
-  await server.register(view, { engine: { pug } });
-
+const startServer = (builder: Builder) => {
   server.get("/", (req, res) => {
     //@ts-expect-error 123
     const { url } = req.query;
+
     if (url) {
       if (!isUrl(url)) {
         return res.view("/src/views/index", { url, warning: true });
       }
-      builder.build(url).then((pdf) => {
-        res.type("application/pdf").send(pdf);
+
+      builder.build(url, res).then(() => {
+        res.code(200).send();
       });
     } else {
       res.view("/src/views/index");
@@ -43,4 +45,4 @@ const initServer = async (builder: Builder) => {
   });
 };
 
-export { initServer };
+export { startServer };

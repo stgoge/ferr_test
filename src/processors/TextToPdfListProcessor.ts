@@ -35,11 +35,13 @@ export class TextToPdfListProcessor extends AbstractProcessor {
     doc.on("data", function (chunk) {
       chunks.push(chunk);
     });
+
     doc.on("end", function () {
       result = Buffer.concat(chunks);
       //@ts-expect-error 123
       callback(result);
     });
+
     doc.end();
   }
 

@@ -1,6 +1,6 @@
 import { Builder } from "./Builder.js";
 import { HTMLtoTextProcessor } from "./processors/HTMLtoTextProcessor.js";
-import { TextToPdfListProcessor } from "./processors/ListToPdfProcessor.js";
+import { TextToPdfListProcessor } from "./processors/TextToPdfListProcessor.js";
 import { LoadFromSingleUrlProcessor } from "./processors/LoadFromSingleUrlProcessor.js";
 import { WordsByLengthProcessor } from "./processors/WordsByLengthProcessor.js";
 import { initServer } from "./server.js";

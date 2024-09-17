@@ -24,7 +24,7 @@ const initServer = async (builder: Builder) => {
     const { url } = req.query;
     if (url) {
       if (!isUrl(url)) {
-        res.view("/src/views/index", { url, warning: true });
+        return res.view("/src/views/index", { url, warning: true });
       }
       builder.build(url).then((pdf) => {
         res.type("application/pdf").send(pdf);

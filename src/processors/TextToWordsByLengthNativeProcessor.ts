@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { AbstractProcessor } from "./AbstractProcessor.js";
 
-export class TextToWordsByLengthProcessor extends AbstractProcessor {
+export class TextToWordsByLengthNativeProcessor extends AbstractProcessor {
   count: number = 10;
   longest: boolean = false;
   separator: string = " ";
@@ -12,14 +12,12 @@ export class TextToWordsByLengthProcessor extends AbstractProcessor {
     this.separator = separator ?? this.separator;
   }
   public process(text: string) {
-    const words = _.words(text);
-    const set = new Set(words);
-    const uniqueWords = Array.from(set)
+    const words = _.words(text)
       .sort((word1, word2) =>
         this.longest ? word2.length - word1.length : word1.length - word2.length
       )
       .slice(0, this.count)
       .join(this.separator);
-    return Promise.resolve(uniqueWords);
+    return Promise.resolve(words);
   }
 }

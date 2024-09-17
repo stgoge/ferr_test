@@ -3,10 +3,10 @@ import view from "@fastify/view";
 import pug from "pug";
 
 import { Builder } from "./Builder.js";
-import { HTMLtoTextProcessor } from "./processors/HTMLtoTextProcessor.js";
 import { WordsToPdfListExporter } from "./exporters/WordsToPdfListExporter.js";
 import { FromSingleUrlLoader } from "./loaders/FromSingleUrlLoader.js";
 import { TextToWordsByLengthProcessor } from "./processors/TextToWordsByLengthProcessor.js";
+import { HTMLtoTextNativeProcessor } from "./processors/HTMLtoTextNativeProcessor.js";
 
 const WORDS_COUNT = 10;
 const LONGEST = true;
@@ -29,7 +29,7 @@ await server.register(view, { engine: { pug } });
 const builder = new Builder({
   loader: new FromSingleUrlLoader(),
   processors: [
-    new HTMLtoTextProcessor(),
+    new HTMLtoTextNativeProcessor(),
     new TextToWordsByLengthProcessor(WORDS_COUNT, LONGEST),
   ],
   exporter: new WordsToPdfListExporter(

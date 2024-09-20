@@ -7,33 +7,39 @@ export class Builder {
   loader: AbstractLoader;
   processors: AbstractProcessor[];
   exporter: AbstractExporter;
-  constructor(options: {
-    loader: AbstractLoader;
-    processors?: AbstractProcessor[];
-    exporter: AbstractExporter;
-  }) {
+
+  constructor(options: BuilderOptionsType) {
     this.loader = options.loader;
     this.processors = options.processors ? options.processors.slice() : [];
     this.exporter = options.exporter;
   }
 
-  build(source: string, response: FastifyReply) {
-    return new Promise((resolve) => {
-      this.loader.load(source).then((data: string) => {
-        const processors = this.processors.slice().reverse();
+  async build(source: string, response: FastifyReply) {
+    let data;
+    try {
+      data = await this.loader.load(source);
+    } catch {
+      throw Error("Cant load page.");
+    }
 
-        const internalProcess = (text: string) => {
-          const processor = processors.pop();
+    const processors = this.processors.slice().reverse();
+    let processor = processors.pop();
 
-          if (processor) {
-            processor.process(text).then(internalProcess);
-          } else {
-            this.exporter.export(text, response).then(resolve);
-          }
-        };
+    while (processor) {
+      data = processor.process(data);
+      processor = processors.pop();
+    }
 
-        internalProcess(data);
-      });
-    });
+    try {
+      await this.exporter.export(data, response);
+    } catch {
+      throw Error("Cant export document.");
+    }
   }
 }
+
+type BuilderOptionsType = {
+  loader: AbstractLoader;
+  processors?: AbstractProcessor[];
+  exporter: AbstractExporter;
+};

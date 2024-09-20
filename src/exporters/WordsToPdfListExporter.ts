@@ -18,10 +18,10 @@ const printer = new PdfPrinter(fonts);
 export class WordsToPdfListExporter extends AbstractExporter {
   title: string = "Just unordered list";
   separator: string = " ";
-  constructor(title?: string, separator?: string) {
+  constructor(options: WordsToPdfListExporterOptionsType = {}) {
     super();
-    this.title = title ?? this.title;
-    this.separator = separator ?? this.separator;
+    this.title = options.title ?? this.title;
+    this.separator = options.separator ?? this.separator;
   }
 
   public export(text: string, response: FastifyReply) {
@@ -69,3 +69,8 @@ export class WordsToPdfListExporter extends AbstractExporter {
     });
   }
 }
+
+type WordsToPdfListExporterOptionsType = {
+  title?: string;
+  separator?: string;
+};
